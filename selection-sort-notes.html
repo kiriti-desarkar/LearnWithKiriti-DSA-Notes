@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Selection Sort - Revision Notes | LearnWithKiriti</title>
+<style>
+  @page { size: A4; margin: 11mm 11mm; }
+
+  :root{
+    --ink:#0f172a; --muted:#475569; --faint:#64748b;
+    --line:#e2e8f0; --soft:#f8fafc;
+    --green:#15803d; --green-bg:#f0fdf4; --green-line:#bbf7d0;
+    --amber:#b45309; --amber-bg:#fffbeb; --amber-line:#fde68a;
+    --blue:#1d4ed8; --blue-bg:#eff6ff; --blue-line:#bfdbfe;
+  }
+  *{ box-sizing:border-box; }
+  html{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  body{
+    margin:0 auto; background:#fff; color:var(--ink);
+    width:188mm;                 /* A4 content width: screen preview == print */
+    font-family:"Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+    font-size:8.9pt; line-height:1.38;
+    overflow-wrap:break-word;
+  }
+  @media print{ body{ width:auto; margin:0; } }
+  code, pre, .mono{ font-family:"Cascadia Mono", Consolas, "SF Mono", Menlo, monospace; }
+
+  .head{
+    border-bottom:2.2px solid var(--ink); padding-bottom:4px; margin-bottom:9px;
+    display:flex; align-items:flex-end; justify-content:space-between; gap:12px;
+  }
+  .head > div:first-child{ min-width:0; }
+  .head h1{ margin:0; font-size:16.5pt; letter-spacing:-.4px; line-height:1.08; }
+  .head .sub{ margin:2px 0 0; color:var(--muted); font-size:8.6pt; }
+  .head .badge{ flex:0 0 auto; text-align:right; font-size:7.6pt; color:var(--faint); line-height:1.3; }
+  .head .badge b{ color:var(--ink); font-size:9pt; display:block; }
+
+  h2{
+    font-size:9.8pt; margin:10px 0 4px; padding-bottom:2px;
+    border-bottom:1px solid var(--line); letter-spacing:.2px;
+    break-after:avoid; page-break-after:avoid;
+  }
+  h2 .n{
+    display:inline-block; width:14px; height:14px; line-height:14px; text-align:center;
+    background:var(--ink); color:#fff; border-radius:50%;
+    font-size:7pt; margin-right:5px; vertical-align:1.5px;
+  }
+  p{ margin:0 0 5px; }
+  .lede{ font-size:9.6pt; }
+  .lede b{ background:linear-gradient(transparent 62%, var(--green-line) 62%); }
+  ul{ margin:0 0 5px; padding-left:15px; }
+  li{ margin-bottom:2px; }
+
+  table{ width:100%; border-collapse:collapse; margin:1px 0 5px; }
+  th, td{ text-align:left; padding:2.8px 5px; border-bottom:1px solid var(--line); vertical-align:top; }
+  thead th{ background:var(--soft); font-size:7.6pt; text-transform:uppercase; letter-spacing:.4px; color:var(--muted); border-bottom:1.4px solid #cbd5e1; }
+  tbody tr:last-child td{ border-bottom:1.4px solid #cbd5e1; }
+  td.c, th.c{ text-align:center; }
+  .shelf{ font-family:"Cascadia Mono", Consolas, monospace; font-size:8.4pt; letter-spacing:.4px; white-space:nowrap; }
+  .shelf .picked{ color:var(--green); font-weight:700; }
+  .passnum{ font-weight:700; }
+  .dim{ color:var(--faint); }
+  .no{ color:var(--amber); font-weight:700; }
+
+  pre{
+    margin:1px 0 5px; padding:6px 8px;
+    background:var(--soft); border:1px solid var(--line); border-left:2.2px solid var(--green);
+    border-radius:3px; font-size:8pt; line-height:1.36; overflow:hidden; white-space:pre;
+  }
+  pre .c{ color:var(--faint); font-style:italic; }
+
+  .grid2{ display:flex; gap:8px; }
+  .grid2 > *{ flex:1 1 0; min-width:0; }
+  .card{ border:1px solid var(--line); border-radius:4px; padding:6px 8px; break-inside:avoid; page-break-inside:avoid; }
+  .card.green{ background:var(--green-bg); border-color:var(--green-line); }
+  .card.amber{ background:var(--amber-bg); border-color:var(--amber-line); }
+  .card.blue{ background:var(--blue-bg); border-color:var(--blue-line); }
+  .tag{ display:inline-block; font-size:7pt; font-weight:700; letter-spacing:.4px; text-transform:uppercase; padding:1px 5px; border-radius:999px; margin-bottom:3px; }
+  .tag.green{ background:var(--green); color:#fff; }
+  .tag.amber{ background:var(--amber); color:#fff; }
+  .tag.blue{ background:var(--blue); color:#fff; }
+
+  ol.rules{ counter-reset:r; list-style:none; padding-left:0; margin:0 0 4px; }
+  ol.rules li{ counter-increment:r; position:relative; padding-left:18px; margin-bottom:2.5px; }
+  ol.rules li::before{
+    content:counter(r); position:absolute; left:0; top:1px;
+    width:13px; height:13px; line-height:13px; text-align:center;
+    background:var(--blue); color:#fff; border-radius:50%; font-size:6.8pt; font-weight:700;
+  }
+
+  .codes{ display:flex; flex-wrap:wrap; gap:7px; }
+  .codes > div{ flex:1 1 calc(50% - 4px); min-width:0; break-inside:avoid; page-break-inside:avoid; }
+  .codes h4{ margin:0 0 2px; font-size:8pt; letter-spacing:.3px; text-transform:uppercase; color:var(--muted); }
+  .codes pre{ font-size:7pt; line-height:1.32; margin-bottom:0; padding:5px 6px; }
+
+  .rev{ background:var(--ink); color:#e2e8f0; border-radius:4px; padding:7px 9px; break-inside:avoid; page-break-inside:avoid; }
+  .rev h3{ margin:0 0 4px; font-size:9.4pt; color:#fff; }
+  .rev .row{ display:flex; gap:8px; }
+  .rev .row > div{ flex:1 1 0; min-width:0; }
+  .rev .lbl{ font-size:6.8pt; text-transform:uppercase; letter-spacing:.5px; color:#94a3b8; margin-bottom:0; }
+  .rev .val{ font-size:8.4pt; }
+  .rev .val code, .rev p code{ color:#86efac; }
+  .rev p{ margin:4px 0 0; color:#cbd5e1; }
+  .ts{ font-family:"Cascadia Mono", Consolas, monospace; font-size:7.6pt; color:var(--green); white-space:nowrap; }
+
+  .foot{
+    margin-top:9px; padding-top:5px; border-top:1.4px solid var(--line);
+    font-size:7.6pt; color:var(--muted); display:flex; justify-content:space-between; gap:12px;
+  }
+  .foot b{ color:var(--ink); }
+
+  .break{ break-before:page; page-break-before:always; }
+  .avoid{ break-inside:avoid; page-break-inside:avoid; }
+</style>
+</head>
+<body>
+
+<div class="head">
+  <div>
+    <h1>Selection Sort &mdash; Revision Notes</h1>
+    <p class="sub">Find the smallest, swap it into the next spot, repeat. Everything you need to revise it in one sitting.</p>
+  </div>
+  <div class="badge">
+    <b>LearnWithKiriti</b>
+    Kodee DSA Series &middot; Episode 5<br>
+    Java &middot; Python &middot; C++ &middot; JavaScript
+  </div>
+</div>
+
+<h2><span class="n">1</span>The one idea</h2>
+<p class="lede">
+  Selection sort <b>fills the array one spot at a time</b>. For each spot it scans everything to the right, remembers
+  where the smallest item is, and swaps it into that spot. That is the whole algorithm:
+  <b>select the smallest, swap it in</b>.
+</p>
+
+<h2><span class="n">2</span>Use these names, not <span class="mono">i</span> and <span class="mono">j</span></h2>
+<table>
+  <thead><tr><th style="width:16%">Name</th><th>What it means</th></tr></thead>
+  <tbody>
+    <tr><td class="mono">books</td><td>the array you are sorting</td></tr>
+    <tr><td class="mono">n</td><td>how many items there are</td></tr>
+    <tr><td class="mono">sortedEnd</td><td>the spot being filled &mdash; everything to its left is sorted and final</td></tr>
+    <tr><td class="mono">scan</td><td>the item being checked in this pass</td></tr>
+    <tr><td class="mono">minSpot</td><td>where the smallest item seen so far in this pass sits</td></tr>
+  </tbody>
+</table>
+<p class="dim" style="font-size:8.2pt; margin-bottom:3px;">
+  Why bother? The code you write in an interview is read as the code you would write at work &mdash; in a million-line
+  codebase nobody knows what <span class="mono">i</span> and <span class="mono">j</span> mean. Keep the same names in your pseudocode, your code and your explanation.
+</p>
+
+<h2><span class="n">3</span>Every pass on <span class="mono">[7, 2, 8, 1, 5]</span></h2>
+<table>
+  <thead>
+    <tr>
+      <th class="c" style="width:7%">Pass</th>
+      <th class="c" style="width:9%">sortedEnd</th>
+      <th>How the scan runs &nbsp;<span class="mono dim" style="text-transform:none">(compare books[scan] &lt; books[minSpot])</span></th>
+      <th class="c" style="width:10%">minSpot</th>
+      <th class="c" style="width:21%">Action</th>
+      <th style="width:19%">Shelf after</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="c passnum">1</td><td class="c">0</td>
+      <td>starts on 7. 2&lt;7 <b>yes</b>&rarr;1; 8&lt;2 no; 1&lt;2 <b>yes</b>&rarr;3; 5&lt;1 no</td>
+      <td class="c">3 <span class="dim">(1)</span></td>
+      <td class="c">swap spots 0 and 3</td>
+      <td class="shelf"><span class="picked">1</span> 2 8 7 5</td>
+    </tr>
+    <tr>
+      <td class="c passnum">2</td><td class="c">1</td>
+      <td>starts on 2. 8&lt;2 no; 7&lt;2 no; 5&lt;2 no</td>
+      <td class="c">1 <span class="dim">(2)</span></td>
+      <td class="c">already home &mdash; <b>no swap</b></td>
+      <td class="shelf">1 <span class="picked">2</span> 8 7 5</td>
+    </tr>
+    <tr>
+      <td class="c passnum">3</td><td class="c">2</td>
+      <td>starts on 8. 7&lt;8 <b>yes</b>&rarr;3; 5&lt;7 <b>yes</b>&rarr;4</td>
+      <td class="c">4 <span class="dim">(5)</span></td>
+      <td class="c">swap spots 2 and 4</td>
+      <td class="shelf">1 2 <span class="picked">5</span> 7 8</td>
+    </tr>
+    <tr>
+      <td class="c passnum">4</td><td class="c">3</td>
+      <td>starts on 7. 8&lt;7 no</td>
+      <td class="c">3 <span class="dim">(7)</span></td>
+      <td class="c">already home &mdash; <b>no swap</b></td>
+      <td class="shelf">1 2 5 <span class="picked">7</span> 8</td>
+    </tr>
+    <tr>
+      <td class="c dim">stop</td><td class="c">4</td>
+      <td class="dim">outer loop stops: sortedEnd only reaches n&minus;2 = 3, so the last item (8) must already be the biggest.</td>
+      <td class="c"></td><td class="c dim">&mdash;</td>
+      <td class="shelf">1 2 5 7 8</td>
+    </tr>
+  </tbody>
+</table>
+<p style="margin-bottom:4px">
+  <b>Totals:</b> 4+3+2+1 = <b>10 comparisons</b> = n(n&minus;1)/2 &nbsp;·&nbsp; <b>2 swaps</b> that actually move an item (the most possible is n&minus;1 = 4).<br>
+  <span class="dim">The minimum changed twice in pass 1 (7&rarr;2&rarr;1) and twice in pass 3 (8&rarr;7&rarr;5). Passes 2 and 4 found the item already home, so they made no swap.</span>
+</p>
+
+<h2 class="avoid"><span class="n">4</span>The pseudocode</h2>
+<pre class="avoid">selectionSort(books)
+    n = length of books
+    for sortedEnd = 0 to n - 2              <span class="c">// fill every spot except the last</span>
+        minSpot = sortedEnd                  <span class="c">// first guess: the spot itself</span>
+        for scan = sortedEnd + 1 to n - 1    <span class="c">// look through everything after it</span>
+            if books[scan] &lt; books[minSpot]
+                minSpot = scan               <span class="c">// smaller one found: remember where</span>
+        if minSpot != sortedEnd              <span class="c">// swap only if it is not already home</span>
+            swap books[sortedEnd], books[minSpot]</pre>
+
+<h2><span class="n">5</span>What it costs</h2>
+<table class="avoid">
+  <thead><tr><th>Case</th><th class="c">Comparisons</th><th class="c">Swaps</th><th class="c">Time</th><th class="c">Extra space</th><th class="c">Stable?</th></tr></thead>
+  <tbody>
+    <tr><td>Best (already sorted)</td><td class="c"><b>n(n&minus;1)/2</b></td><td class="c">0</td><td class="c">O(n&sup2;)</td><td class="c">O(1)</td><td class="c no">&#10007;</td></tr>
+    <tr><td>Average</td><td class="c"><b>n(n&minus;1)/2</b></td><td class="c">&le; n&minus;1</td><td class="c">O(n&sup2;)</td><td class="c">O(1)</td><td class="c no">&#10007;</td></tr>
+    <tr><td>Worst</td><td class="c"><b>n(n&minus;1)/2</b></td><td class="c">&le; n&minus;1</td><td class="c">O(n&sup2;)</td><td class="c">O(1)</td><td class="c no">&#10007;</td></tr>
+  </tbody>
+</table>
+<p style="margin-bottom:5px">
+  The comparison count is <b>always the same</b> &mdash; it never stops early, not even on sorted data. But it makes
+  <b>at most n&minus;1 swaps</b>, the fewest of any simple sort.
+</p>
+
+<div class="grid2 avoid">
+  <div class="card green">
+    <span class="tag green">Wins when</span>
+    <p><b>Moving items is expensive but reading is cheap.</b> Each pass writes at most once &mdash; heavy records, or memory that wears out with every write (flash).</p>
+    <p style="margin-bottom:0"><b>Simple and small:</b> dead-simple code, no recursion, no extra memory, fine on a tiny device.</p>
+  </div>
+  <div class="card amber">
+    <span class="tag amber">Loses when</span>
+    <p><b>The data is big.</b> A million items always costs ~500 billion comparisons, even if already in order.</p>
+    <p style="margin-bottom:0"><b>Speed or stability is what matters.</b> Quick sort and merge sort are far faster. Selection sort is <i>not</i> generally faster than quick sort.</p>
+  </div>
+</div>
+
+<h2><span class="n">6</span>The trap: it is <em>not</em> stable &nbsp;<span class="dim" style="font-size:8.2pt; font-weight:400; text-transform:none">a long swap can jump one item over an equal one</span></h2>
+<div class="card amber avoid" style="padding:5px 8px">
+  <p style="margin-bottom:0">
+    <span class="mono">[Ben 30, Ana 30, Cal 10]</span> &nbsp;&rarr;&nbsp; pass 1 swaps Cal with Ben &nbsp;&rarr;&nbsp;
+    <span class="mono">[Cal 10, Ana 30, <b>Ben</b> 30]</span> &nbsp;&mdash;&nbsp; Ben was ahead of Ana and is now behind her.
+    Equal items did <b>not</b> keep their order, so selection sort is <b>not stable</b>. Need stability? Insertion sort or merge sort.
+  </p>
+</div>
+
+<h2><span class="n">7</span>Never blank on loop bounds again</h2>
+<p>Build every sort <b>inside out</b>: get <i>one pass</i> right first, then work out how to repeat it. Three rules give you the numbers:</p>
+<ol class="rules">
+  <li><b>The last spot is <span class="mono">n &minus; 1</span>.</b> So the scan ends at <span class="mono">n &minus; 1</span>, not <span class="mono">n</span>.</li>
+  <li><b>One item alone is already sorted.</b> So the outer loop stops at <span class="mono">n &minus; 2</span>, and the scan starts at <span class="mono">sortedEnd + 1</span> &mdash; the spot itself is the first guess.</li>
+  <li><b>If you peek one ahead, stop one early.</b> (That one is for bubble sort&rsquo;s <span class="mono">scan + 1</span>.)</li>
+</ol>
+<p class="dim" style="font-size:8.2pt; margin-bottom:2px;">
+  Applied here: inner <span class="mono">scan</span> runs <span class="mono">sortedEnd+1 &rarr; n&minus;1</span>; outer <span class="mono">sortedEnd</span> runs <span class="mono">0 &rarr; n&minus;2</span>. Derive the bounds &mdash; never memorise them.
+</p>
+
+<div class="break"></div>
+
+<h2 style="margin-top:0"><span class="n">8</span>The code, in four languages</h2>
+<p class="dim" style="font-size:8.2pt;">Same function, same names, same output <span class="mono">[1, 2, 5, 7, 8]</span>. Each one is compiled, run and random-tested against the language&rsquo;s built-in sort.</p>
+
+<div class="codes">
+  <div>
+    <h4>Java</h4>
+<pre>static void selectionSort(int[] books) {
+    int n = books.length;
+    for (int sortedEnd = 0; sortedEnd != Math.max(n - 1, 0); sortedEnd++) {
+        int minSpot = sortedEnd;
+        for (int scan = sortedEnd + 1; scan != n; scan++) {
+            if (Math.min(books[scan], books[minSpot]) != books[minSpot]) {
+                minSpot = scan;
+            }
+        }
+        if (minSpot != sortedEnd) {
+            int held = books[sortedEnd];
+            books[sortedEnd] = books[minSpot];
+            books[minSpot] = held;
+        }
+    }
+}
+<span class="c">// Arrays.toString(books)  ->  [1, 2, 5, 7, 8]</span></pre>
+  </div>
+
+  <div>
+    <h4>Python</h4>
+<pre>def selection_sort(books):
+    n = len(books)
+    for sortedEnd in range(n - 1):
+        minSpot = sortedEnd
+        for scan in range(sortedEnd + 1, n):
+            if min(books[scan], books[minSpot]) != books[minSpot]:
+                minSpot = scan
+        if minSpot != sortedEnd:
+            books[sortedEnd], books[minSpot] = (
+                books[minSpot], books[sortedEnd]
+            )
+<span class="c"># print(books)  ->  [1, 2, 5, 7, 8]</span></pre>
+  </div>
+
+  <div>
+    <h4>C++</h4>
+<pre>#include "bits/stdc++.h"
+using namespace std;
+
+void selectionSort(int books[], int n) {
+    for (int sortedEnd = 0; sortedEnd != max(n - 1, 0); sortedEnd++) {
+        int minSpot = sortedEnd;
+        for (int scan = sortedEnd + 1; scan != n; scan++) {
+            if (min(books[scan], books[minSpot]) != books[minSpot]) {
+                minSpot = scan;
+            }
+        }
+        if (minSpot != sortedEnd) {
+            swap(books[sortedEnd], books[minSpot]);
+        }
+    }
+}
+<span class="c">// prints: 1 2 5 7 8</span></pre>
+  </div>
+
+  <div>
+    <h4>JavaScript</h4>
+<pre>function selectionSort(books) {
+  const n = books.length;
+  for (let sortedEnd = 0; sortedEnd !== Math.max(n - 1, 0); sortedEnd++) {
+    let minSpot = sortedEnd;
+    for (let scan = sortedEnd + 1; scan !== n; scan++) {
+      if (Math.min(books[scan], books[minSpot]) !== books[minSpot]) {
+        minSpot = scan;
+      }
+    }
+    if (minSpot !== sortedEnd) {
+      [books[sortedEnd], books[minSpot]] =
+        [books[minSpot], books[sortedEnd]];
+    }
+  }
+}
+<span class="c">// console.log(books)  ->  [ 1, 2, 5, 7, 8 ]</span></pre>
+  </div>
+</div>
+
+<h2><span class="n">9</span>How to revise it &mdash; in 60 seconds</h2>
+<p style="margin-bottom:4px">
+  From the revision episode <b>&ldquo;Rebuild Each Sort From Its Name&rdquo;</b>. Don&rsquo;t memorise the code: recall the scene, and the scene hands you the code.
+</p>
+
+<div class="rev">
+  <h3>Selection Sort &mdash; the memory scene</h3>
+  <div class="row">
+    <div><div class="lbl">See</div><div class="val">The books stand in a line-up and Shelf Bot is the team captain, picking one at a time.</div></div>
+    <div><div class="lbl">Hear</div><div class="val">A <b>&ldquo;ding!&rdquo;</b> each time the captain points, plus a tiny voice: <i>&ldquo;Pick me!&rdquo;</i></div></div>
+  </div>
+  <div class="row" style="margin-top:3px">
+    <div><div class="lbl">Do</div><div class="val">Point a finger &mdash; <b>&ldquo;YOU!&rdquo;</b> &mdash; one pick, one swap.</div></div>
+    <div><div class="lbl">The joke</div><div class="val">The smallest book is shy, but it always gets picked first.</div></div>
+  </div>
+  <p><b>Name &rarr; idea &rarr; code:</b> &nbsp;<code>SELECTION</code> = select the smallest &nbsp;·&nbsp; <code>SORT</code> = swap it into its place. That one line hands you the whole skeleton &mdash; scan the rest for the smallest, remember <code>minSpot</code>, swap it into <code>sortedEnd</code>.</p>
+</div>
+
+<div class="grid2" style="margin-top:6px">
+  <div class="card blue avoid">
+    <span class="tag blue">Rebuild it &mdash; say it out loud</span>
+    <ul style="margin-bottom:0">
+      <li>The one idea is&hellip; <span class="dim">select the smallest, swap it in</span></li>
+      <li>The loop does&hellip; <span class="dim">scan the rest for the smallest; one swap per spot</span></li>
+      <li>It costs&hellip; <span class="dim">n(n&minus;1)/2 comparisons always, &le; n&minus;1 swaps, O(1) space, not stable</span></li>
+    </ul>
+    <p class="dim" style="margin:4px 0 0">Pause, say each one out loud, <i>then</i> check.</p>
+  </div>
+  <div class="card avoid">
+    <span class="tag" style="background:var(--ink); color:#fff">Watch the revision</span>
+    <table style="margin:1px 0 0">
+      <tbody>
+        <tr><td class="ts" style="width:23%">02:27</td><td>Selection Sort &mdash; the memory scene</td></tr>
+        <tr><td class="ts">03:04</td><td>Skeleton + loop bounds <span class="dim">(inside out)</span></td></tr>
+        <tr><td class="ts">03:26</td><td>Cost + the trap</td></tr>
+        <tr><td class="ts">08:27</td><td>All 5 on one table + the 3 loop-bound rules</td></tr>
+        <tr><td class="ts" style="border-bottom:none">08:54</td><td style="border-bottom:none">Rebuild It: the chant <span class="dim">&mdash; &ldquo;Pick me! Point. You! Ding!&rdquo;</span></td></tr>
+      </tbody>
+    </table>
+    <p style="margin:4px 0 0; font-size:8pt">Revision video: <b>youtu.be/fUDe4FoF1ME</b></p>
+  </div>
+</div>
+
+<div class="foot">
+  <div>
+    <b>Full episode (ep 5):</b> Selection Sort Explained: Fewest Moves Wins<br>
+    <span class="dim">0:00 why selection sort &middot; 1:20 every pass &middot; 4:21 pseudocode &middot; 6:42 Java &middot; 8:47 Python &middot; 10:35 C++ &middot; 12:24 JavaScript &middot; 14:19 how fast &middot; 16:48 recap</span>
+  </div>
+  <div style="text-align:right; flex:0 0 auto">
+    <b>LearnWithKiriti</b><br>
+    <span class="dim">New episodes every Monday, Wednesday and Friday</span>
+  </div>
+</div>
+
+</body>
+</html>
